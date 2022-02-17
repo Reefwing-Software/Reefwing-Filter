@@ -87,11 +87,6 @@ class ComplementaryFilter {
       input_B = B;
     }
 
-    static_assert(
-        alpha < 1.0,  
-        "The weighting factor alpha needs to be less than or equal to 1."
-    );
-
     float result() { return ((alpha * input_A) + (1 - alpha) * input_B); }
     void setValues(float bias, float A, float B) {
       alpha = bias;
@@ -101,7 +96,7 @@ class ComplementaryFilter {
 
   private:
     float alpha = 0.98;
-    float input_A = 0.0;, 
+    float input_A = 0.0;
     float input_B = 0.0;
 };
 
