@@ -29,7 +29,7 @@ class SMA {
 
     //  Constructor (initial state is initialized to given value).
     SMA(input_t initialValue) : sum(N * (sum_t)initialValue) {
-        std::fill(std::begin(previousInputs), std::end(previousInputs),
+        fill(begin(previousInputs), end(previousInputs),
                   initialValue);
     }
 
