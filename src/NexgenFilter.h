@@ -13,6 +13,9 @@
   Credits - SMA and EMA filter code is extracted from the 
             Arduino-Filters Library by Pieter Pas
             (https://github.com/tttapa/Arduino-Filters)
+          - Simple Kalman Filter is from the library by 
+            Denys Sene (https://github.com/denyssene/SimpleKalmanFilter).
+          - Pink Noise Algorithm (http://www.ridgerat-tech.us/pink/pinkalg.htm)
 
 ******************************************************************/
 
@@ -98,6 +101,58 @@ class ComplementaryFilter {
     float alpha = 0.98;
     float input_A = 0.0;
     float input_B = 0.0;
+};
+
+/*
+ * SimpleKalmanFilter - a Kalman Filter implementation for single variable models.
+ * Created by Denys Sene, January, 1, 2017.
+ * Released under MIT License - see LICENSE file for details.
+ */
+
+class SimpleKalmanFilter {
+
+public:
+  SimpleKalmanFilter(float mea_e, float est_e, float q);
+  
+  float updateEstimate(float mea);
+  void setMeasurementError(float mea_e);
+  void setEstimateError(float est_e);
+  void setProcessNoise(float q);
+  float getKalmanGain();
+  float getEstimateError();
+
+private:
+  float _err_measure;
+  float _err_estimate;
+  float _q;
+  float _current_estimate = 0;
+  float _last_estimate = 0;
+  float _kalman_gain = 0;
+
+};
+
+class NoiseGenerator {
+  public:
+    NoiseGenerator() {
+      randomSeed(analogRead(A0));
+      clearPinkState();
+    }
+
+    bool oneBitLFSR();
+    double gaussianWithDeviation(int sd=1);
+    void clearPinkState();
+    float threeStagePink();
+    long randomWithRange(int min=-5, int max=5) { return (random(min, max)); }
+
+  private:
+    const uint16_t LFSR_INIT = 0xfeed;  //  Seed Value - any non-zero value
+    const uint16_t LFSR_MASK = 0x8016;  //  Ref: http://users.ece.cmu.edu/~koopman/lfsr/
+    
+    static const uint16_t PINK_NOISE_STAGES = 3;
+    float state[PINK_NOISE_STAGES];
+    static const float A[PINK_NOISE_STAGES];
+    static const float P[PINK_NOISE_STAGES];
+
 };
 
 #endif

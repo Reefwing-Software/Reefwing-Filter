@@ -101,7 +101,119 @@ The 𝛂 = 𝛃 = 0.5 in the above formula is the weighting or bias applied to t
 
 In most examples that you will see, 𝛂 = 0.98 for the gyro angle input and 𝛃 = 0.02 for the accelerometer contribution. The higher the 𝛂, the quicker the response but the higher the drift. A lower 𝛂 will reduce drift but the accelerometer is susceptible to vibration.
 
+## Simple Kalman Filter (SKF)
+
+A basic implementation of the [Kalman Filter](https://github.com/denyssene/SimpleKalmanFilter) for single variable models. It can be used with a stream of single values like barometric sensors, temperature sensors, gyroscope, and accelerometers.
+
+The Kalman filter is a set of mathematical equations that provides an efficient computational (recursive) means to estimate the state of a process, in a way that minimizes the mean of the squared error. The filter is very powerful because:
+- it supports estimations of past, present, and even future states, and 
+- it can do so even when the precise nature of the modeled system is unknown.
+
+### Basic Usage
+
+- `e_mea`: Measurement Uncertainty - How much do we expect to our measurement vary
+- `e_est`: Estimation Uncertainty - Can be initilized with the same value as e_mea since the kalman filter will adjust its value.
+- `q`: Process Variance - usually a small number between 0.001 and 1 - how fast your measurement moves. Recommended 0.01. Should be tuned for the application.
+
+```c++
+ SimpleKalmanFilter kf = SimpleKalmanFilter(e_mea, e_est, q);
+
+ while (1) {
+  float x = analogRead(A0);
+  float estimated_x = kf.updateEstimate(x);
+  
+  // ...
+ } 
+```
+
+## Noise Generator
+
+When testing filters, it is often handy to be able to add noise to sensor readings. We can then apply our different filters and see which performs best with different types of noise.
+
+The noise generators available are:
+
+- `randomWithRange(int min, int max)`: This generator will generate a random `long` between `min` and `max`. `min` and `max` can be positive or negative.
+- `gaussianWithDeviation(int sd)`: Gaussian noise, is statistical noise having a probability density function (PDF) equal to that of the normal distribution, which is also known as the Gaussian distribution. In other words, the values that the noise can take on are Gaussian-distributed. This function generates an Additive White Gaussian Noise (AWGN) sample. The default generated sample set will have zero mean and a standard deviation of 1. Initialise with a different number of standard deviations (`sd`) if required.
+- `threeStagePink()`: In Pink Noise the power spectral density (power per frequency interval) is inversely proportional to the frequency of the signal. In other words, each octave interval (halving or doubling in frequency) carries an equal amount of noise energy. The Pink Noise code is based on the Trammell algorithm (http://www.ridgerat-tech.us/pink/pinkalg.htm).
+- `oneBitLFSR()`: Our final generator returns a pseudo random 0 or 1. A linear-feedback shift register (LFSR) is a shift register whose input bit is a linear function of its previous state. They can produce a sequence of bits that appears random and has a very long cycle (2^16 in our case). The algorithm is derived from http://users.ece.cmu.edu/~koopman/lfsr/.
+
 ## Examples
 
 ### 1. Simple Moving Average - Analogue Read
 
+This sketch is designed to be used with the Arduino IDE Serial 
+Plotter (`CTRL+SHFT+L`). The vertical (y-axis) on the plotter
+auto scales and the x-axis is a fixed 500 points with each tick
+mark indicative of a Serial.println(). With a 20 ms delay you see
+10 seconds of data (i.e., 500 x 20 ms).
+
+If you want to stop autoscaling, add the following to loop():
+```c++
+Serial.println("Min:0,Max:1023");
+```
+Even with nothing connected to `A0` you will see the pin floating.
+On our UNO there was a sinusoidal signal that varied between 360
+and 400 - probably around 50Hz.
+
+Try experimenting with the SMA window variable `N`. If you make this
+number too big excessive smoothing and lag will be introduced.
+
+### 2. Comparing the SMA and EMA filter
+
+This example is similar to the `simpleSMA.ino` sketch but adds an `EMA` filter as well. It is also is designed to be used with the Arduino IDE Serial 
+Plotter (`CTRL+SHFT+L`).
+
+You will note that the `EMA` is quicker to respond than the `SMA` and will be better for catching quick sensor changes but also be more susceptible to noise and vibration. The `SMA` has a noticable lag which increases as you increase the window (`N`). Too large an `N` on the `SMA` will obscure the original signal and needs to be suited to the application. 
+
+For the `EMA`, the variable `K` determines the cut-off frequency of the low pass filter (LPF).  The higher the value of `K`, the lower the LPF 3 dB point and the greater the filtering.
+
+### 3. Arduino UNO Temperature Sensor
+
+This sketch is designed to be used with the Arduino IDE Serial 
+Plotter (`CTRL+SHFT+L`). 
+  
+The Arduino UNO uses the ATMega328P MCU. It has an internal chip
+temperature sensor connected to the ADC, which you can read. It is
+not very accurate (plus or minus 10 degrees) but it serves as a
+sensor that we can filter data on.
+
+As MCU specific register addresses are used in this sketch, it will only
+work with Arduino boards which use the ATMega328P (i.e., the UNO and 
+original Nano).
+
+After switch on our ATMega328P warms up to just over 250 C fairly
+quickly. From that point there is not much to filter so we add
+some artificial noise.
+
+Both the `SMA` and `EMA` filters do a good job of filtering out this 
+random noise. If you can't see the `SMA` and `EMA` curves because they
+are covered by the temperature, try adding a fixed offset like plus
+and minus 5 to the SMA and EMA plots. For example,
+
+```c++
+smaValue = sma(rawValue) + 5;
+emaValue = ema(rawValue) - 5;
+```
+
+The initialisation of the Kalman Filter is as follows.
+
+```c++
+SimpleKalmanFilter(e_mea, e_est, q);
+```
+
+Where: 
+  - `e_mea`: Measurement Uncertainty 
+  - `e_est`: Estimation Uncertainty 
+  - `q`: Process Noise
+
+The NexgenFilter library contains various types of noise generators,
+including:
+
+  - random white noise;
+  - pink noise; and
+  - gaussian noise.
+  
+As the temperature reading is not inherently noisy, we can add some
+artificial noise and then try to filter it back out. We can then compare
+the filtered signal to our original temperature reading to determine
+how well our filters perform.
