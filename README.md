@@ -1,5 +1,5 @@
 ## Nexgen Filter
- This library contains a collection of filter classes used in the Nexgen Magpie Drone Flight Controller.
+ This library contains a collection of filter classes and noise generators used in the Nexgen Magpie Drone Flight Controller.
 
  ## Simple Moving Average (SMA)
 
