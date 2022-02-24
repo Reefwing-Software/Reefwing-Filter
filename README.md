@@ -91,7 +91,7 @@ CF = 𝛂 × Input_A + 𝛃 × Input_B
 ```
 Where:
 - 𝛂 + 𝛃 = 1 and are the two weighting factors; and
-- Input_A & Input_B are two measurements of the same thing from differeny sensors.
+- Input_A & Input_B are two measurements of the same thing from different sensors.
 
 An example of how you would use this filter would be deriving roll or pitch angles from an IMU. Gyroscope data is fast to respond but drifts over time. Angle data calculated from the accelerometer is sensitive to vibration but accurate in the long term. The combined results of these two sensors can provide a better result than either alone. We can use a complementary filter to combine them: 
 ```

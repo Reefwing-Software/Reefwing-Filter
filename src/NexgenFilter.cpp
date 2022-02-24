@@ -5,11 +5,12 @@
   @copyright  Please see the accompanying LICENSE.txt file.
 
   Code:        David Such
-  Version:     1.0.1
-  Date:        20/02/22
+  Version:     1.0.2
+  Date:        24/02/22
 
   1.0.0 Original Release.           14/02/22
   1.0.1 Fixed Guassian defn.        20/02/22
+  1.0.2 Fixed #define               24/02/22
 
   Credits - SMA and EMA filter code is extracted from the 
             Arduino-Filters Library by Pieter Pas
