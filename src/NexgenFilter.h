@@ -5,12 +5,13 @@
   @copyright  Please see the accompanying LICENSE.txt file.
 
   Code:        David Such
-  Version:     1.0.2
-  Date:        24/02/22
+  Version:     1.1.0
+  Date:        04/03/22
 
   1.0.0 Original Release.           14/02/22
   1.0.1 Fixed Guassian defn.        20/02/22
   1.0.2 Fixed #define               24/02/22
+  1.1.0 Added Madgwick & Mahony     04/03/22
 
   Credits - SMA and EMA filter code is extracted from the 
             Arduino-Filters Library by Pieter Pas
@@ -18,6 +19,8 @@
           - Simple Kalman Filter is from the library by 
             Denys Sene (https://github.com/denyssene/SimpleKalmanFilter).
           - Pink Noise Algorithm (http://www.ridgerat-tech.us/pink/pinkalg.htm)
+          - Quaternion conversion to Euler Angles
+            (https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles)
 
 ******************************************************************/
 
@@ -25,6 +28,36 @@
 #define NexgenFilter_h
 
 #include "Arduino.h"
+
+/******************************************************************
+ *
+ * Quaternion Class Definition - 
+ * 
+ ******************************************************************/
+
+struct EulerAngles {
+  double yaw, pitch, roll;    
+};
+
+class Quaternion {
+  public:
+    Quaternion();
+    Quaternion(double w, double x, double y, double z);
+    Quaternion(double yaw, double pitch, double roll);
+
+    EulerAngles toEulerAngels();
+    void madgwickUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz); 
+
+    double q0, q1, q2, q3;      //  Euler Parameters
+    EulerAngles eulerAngles;
+
+};
+
+/******************************************************************
+ *
+ * Filter Class Prototypes - 
+ * 
+ ******************************************************************/
 
 template <uint8_t N, class input_t = uint16_t, class sum_t = uint32_t>
 class SMA {
@@ -132,6 +165,12 @@ private:
   float _kalman_gain = 0;
 
 };
+
+/******************************************************************
+ *
+ * Filter Class Prototypes - 
+ * 
+ ******************************************************************/
 
 class NoiseGenerator {
   public:

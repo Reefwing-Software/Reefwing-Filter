@@ -5,24 +5,93 @@
   @copyright  Please see the accompanying LICENSE.txt file.
 
   Code:        David Such
-  Version:     1.0.2
-  Date:        24/02/22
+  Version:     1.1.0
+  Date:        04/03/22
 
   1.0.0 Original Release.           14/02/22
   1.0.1 Fixed Guassian defn.        20/02/22
   1.0.2 Fixed #define               24/02/22
+  1.1.0 Added Madgwick & Mahony     04/03/22
 
   Credits - SMA and EMA filter code is extracted from the 
             Arduino-Filters Library by Pieter Pas
             (https://github.com/tttapa/Arduino-Filters)
           - Simple Kalman Filter is from the library by 
             Denys Sene (https://github.com/denyssene/SimpleKalmanFilter).
+          - Pink Noise Algorithm (http://www.ridgerat-tech.us/pink/pinkalg.htm)
+          - Quaternion conversion to Euler Angles
+            (https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles)
 
 ******************************************************************/
 
 #include "Arduino.h"
 #include "NexgenFilter.h"
 #include <math.h>
+
+/******************************************************************
+ * 
+ *  Quaternion
+ * 
+ ******************************************************************/
+
+Quaternion::Quaternion() {
+  q0 = q1 = q2 = q3 = 0.0;
+  yaw = pitch = roll = 0.0;
+}
+
+Quaternion::Quaternion(double w, double x, double y, double z) {
+  q0 = w;
+  q1 = x;
+  q2 = y;
+  q3 = z;
+}
+
+Quaternion::Quaternion(double yaw, double pitch, double roll) {
+  //  Converts Euler Angles,  yaw (Z), pitch (Y), and roll (X) in radians
+  //  to a unit quaternion.
+  //  ref: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
+  double cy = cos(yaw * 0.5);
+  double sy = sin(yaw * 0.5);
+  double cp = cos(pitch * 0.5);
+  double sp = sin(pitch * 0.5);
+  double cr = cos(roll * 0.5);
+  double sr = sin(roll * 0.5);
+
+  q0 = cr * cp * cy + sr * sp * sy;
+  q1 = sr * cp * cy - cr * sp * sy;
+  q2 = cr * sp * cy + sr * cp * sy;
+  q3 = cr * cp * sy - sr * sp * cy;
+}
+
+EulerAngles Quaternion::toEulerAngels() {
+  //  Converts a quaternion to Euler Angles
+  //  ref: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
+  EulerAngles angles;
+
+  // roll (x-axis rotation)
+  double sinr_cosp = 2 * (q0 * q1 + q2 * q3);
+  double cosr_cosp = 1 - 2 * (q1 * q1 + q2 * q2);
+
+  angles.roll = atan2(sinr_cosp, cosr_cosp);
+
+  // pitch (y-axis rotation)
+  double sinp = 2 * (q0 * q2 - q3 * q1);
+
+  if (abs(sinp) >= 1)
+      angles.pitch = copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+  else
+      angles.pitch = asin(sinp);
+
+  // yaw (z-axis rotation)
+  double siny_cosp = 2 * (q0 * q3 + q1 * q2);
+  double cosy_cosp = 1 - 2 * (q2 * q2 + q3 * q3);
+
+  angles.yaw = atan2(siny_cosp, cosy_cosp);
+
+  return angles;
+}
 
 /******************************************************************
  * 
