@@ -1,6 +1,6 @@
 /******************************************************************
   @file       ReefwingFilter.h
-  @brief      A collection of filters used in the Magpie Flight Controller.
+  @brief      A collection of filters used in the Reefwing Flight Controller.
   @author     David Such
   @copyright  Please see the accompanying LICENSE.txt file.
 
