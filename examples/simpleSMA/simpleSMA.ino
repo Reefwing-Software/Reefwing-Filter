@@ -5,10 +5,14 @@
   @copyright  Please see the accompanying LICENSE.txt file.
 
   Code:        David Such
-  Version:     1.0
-  Date:        14/02/22
+  Version:     2.0.0
+  Date:        15/12/22
 
-  1.0 Original Release          14/02/22
+  1.0.0 Original Release.           14/02/22
+  1.0.1 Fixed Guassian defn.        20/02/22
+  1.0.2 Fixed #define               24/02/22
+  1.1.0 Added Madgwick & Mahony     04/03/22
+  2.0.0 Changed Repo and Branding   15/12/22
 
   This sketch is designed to be used with the Arduino IDE Serial 
   Plotter (CTRL+SHFT+L). The vertical (y-axis) on the plotter
@@ -28,7 +32,7 @@
 
 ******************************************************************/
 
-#include <NexgenFilter.h>
+#include <ReefwingFilter.h>
 
 static SMA<5> sma;
 

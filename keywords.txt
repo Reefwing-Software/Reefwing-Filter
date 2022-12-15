@@ -1,5 +1,5 @@
 #######################################
-# IDE Map for Nexgen Filter
+# IDE Map for Reefwing Filter
 #######################################
 
 #######################################
@@ -8,7 +8,7 @@
 
 SMA KEYWORD1
 EMA KEYWORD1
-NexgenFilter KEYWORD1
+ReefwingFilter KEYWORD1
 ComplementaryFilter KEYWORD1
 SimpleKalmanFilter	KEYWORD1
 NoiseGenerator  KEYWORD1

@@ -1,5 +1,5 @@
-## Nexgen Filter
- This library contains a collection of filter classes and noise generators used in the Nexgen Magpie Drone Flight Controller.
+## Reefwing Filter
+ This library contains a collection of filter classes and noise generators used in the Reefwing Magpie Drone Flight Controller.
 
  ### Simple Moving Average (SMA)
 
@@ -268,7 +268,7 @@ Where:
   - `e_est`: Estimation Uncertainty 
   - `q`: Process Noise
 
-The NexgenFilter library contains various types of noise generators,
+The ReefwingFilter library contains various types of noise generators,
 including:
 
   - random white noise;
