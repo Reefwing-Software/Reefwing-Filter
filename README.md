@@ -1,5 +1,7 @@
+![version](https://img.shields.io/github/v/tag/Reefwing-Software/Reefwing-Filter) ![license](https://img.shields.io/badge/license-MIT-green) ![release](https://img.shields.io/github/release-date/Reefwing-Software/Reefwing-Filter?color="red") ![open source](https://badgen.net/badge/open/source/blue?icon=github)
+
 ## Reefwing Filter
- This library contains a collection of filter classes and noise generators used in the Reefwing Magpie Drone Flight Controller.
+ This library contains a collection of filter classes and noise generators used in the Reefwing Raven Drone Flight Controller.
 
  ### Simple Moving Average (SMA)
 
